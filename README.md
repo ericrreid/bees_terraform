@@ -1,10 +1,11 @@
 # Example files to support ABI's BEES effort
 Terraform templates, making use of MongoDB Atlas Provider (anywhere from v1.2.0 to v1.4.x) to:
   - Create backup scheme for existing Cluster
+    - Assumes existing Cluster
   - Restore existing backup snapshot to a Cluster (overwriting data)
-  - Assumes existing Cluster
-  - Assumes existing Snapshot of that Cluster
-  - Assumes existing Target Cluster
+    - Assumes existing Cluster
+    - Assumes existing Snapshot of that Cluster
+    - Assumes existing Target Cluster
 Note: Cluster creation logic is also included in main.tf, and would likely be something different in actual production code
 
 Author: eric.reid@mongodb.com
