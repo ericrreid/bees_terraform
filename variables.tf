@@ -16,7 +16,30 @@ variable "project" {
   )
 }
 
-variable "cluster" {
+variable "source_cluster" {
+  type = object(
+    {
+      project_id = string
+      provider_name = string
+      name = string
+      provider_instance_size_name = string
+      cluster_type = string
+      mongodb_major_version = string
+      cloud_backup = bool
+      replication_specs = object({
+        num_shards = number
+        regions_config = object({
+          region_name     = string
+          electable_nodes = number
+          priority        = number
+          read_only_nodes = number
+        })
+      }) 
+    }
+  )
+}
+
+variable "target_cluster" {
   type = object(
     {
       project_id = string

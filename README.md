@@ -6,10 +6,10 @@ Terraform templates, making use of MongoDB Atlas Provider (anywhere from v1.2.0 
     - Assumes existing Cluster
     - Assumes existing Snapshot of that Cluster
     - Assumes existing Target Cluster
-Note: Cluster creation logic is also included in main.tf, and would likely be something different in actual production code
+Note: Cluster creation logic is also included in main.tf (for source and target clusters), and would likely be something different in actual production code
 
 Author: eric.reid@mongodb.com
-Repo: https://github.com/ericrreid/abi_bees
+Repo: https://github.com/ericrreid/bees_terraform
 
 Note: all code is provided with the understanding that it is:
   - Not production-ready

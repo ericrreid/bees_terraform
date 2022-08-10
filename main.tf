@@ -3,24 +3,43 @@ provider "mongodbatlas" {
   private_key = var.atlas_access.private_key
 }
 
-resource "mongodbatlas_cluster" "cluster" {
+resource "mongodbatlas_cluster" "source_cluster" {
   # These uniquely identify the existing cluster (it gets created otherwise)
-  project_id = var.cluster.project_id
-  name = var.cluster.name
-  provider_name = var.cluster.provider_name
-  provider_instance_size_name = var.cluster.provider_instance_size_name
-  cluster_type = var.cluster.cluster_type
-  mongo_db_major_version = var.cluster.mongodb_major_version
+  project_id = var.source_cluster.project_id
+  name = var.source_cluster.name
+  provider_name = var.source_cluster.provider_name
+  provider_instance_size_name = var.source_cluster.provider_instance_size_name
+  cluster_type = var.source_cluster.cluster_type
+  mongo_db_major_version = var.source_cluster.mongodb_major_version
   replication_specs { 
-    num_shards = var.cluster.replication_specs.num_shards
+    num_shards = var.source_cluster.replication_specs.num_shards
     regions_config {
-      region_name=var.cluster.replication_specs.regions_config.region_name
-      electable_nodes=var.cluster.replication_specs.regions_config.electable_nodes
-      priority=var.cluster.replication_specs.regions_config.priority
-      read_only_nodes=var.cluster.replication_specs.regions_config.read_only_nodes
+      region_name=var.source_cluster.replication_specs.regions_config.region_name
+      electable_nodes=var.source_cluster.replication_specs.regions_config.electable_nodes
+      priority=var.source_cluster.replication_specs.regions_config.priority
+      read_only_nodes=var.source_cluster.replication_specs.regions_config.read_only_nodes
     }
   } 
-  cloud_backup = var.cluster.cloud_backup # Set if not yet set
+  cloud_backup = var.source_cluster.cloud_backup # Set if not yet set
+}
+
+resource "mongodbatlas_cluster" "target_cluster" {
+  project_id = var.target_cluster.project_id
+  name = var.target_cluster.name
+  provider_name = var.target_cluster.provider_name
+  provider_instance_size_name = var.target_cluster.provider_instance_size_name
+  cluster_type = var.target_cluster.cluster_type
+  mongo_db_major_version = var.target_cluster.mongodb_major_version
+  replication_specs { 
+    num_shards = var.target_cluster.replication_specs.num_shards
+    regions_config {
+      region_name=var.target_cluster.replication_specs.regions_config.region_name
+      electable_nodes=var.target_cluster.replication_specs.regions_config.electable_nodes
+      priority=var.target_cluster.replication_specs.regions_config.priority
+      read_only_nodes=var.target_cluster.replication_specs.regions_config.read_only_nodes
+    }
+  } 
+  cloud_backup = var.target_cluster.cloud_backup # Set if not yet set
 }
 
 resource "mongodbatlas_cloud_backup_schedule" "backup_schedule" {
@@ -54,3 +73,21 @@ resource "mongodbatlas_cloud_backup_schedule" "backup_schedule" {
     retention_value    = 12 
   }
 }
+
+resource "mongodbatlas_cloud_backup_snapshot" "snapshot" {
+    project_id        = mongodbatlas_cluster.source_cluster.project_id
+    cluster_name      = mongodbatlas_cluster.source_cluster.name
+    description       = "Test Snapshot for Terraform Testing"
+    retention_in_days = 1
+}
+
+resource "mongodbatlas_cloud_backup_snapshot_restore_job" "restore_job" {
+    project_id      = mongodbatlas_cloud_backup_snapshot.snapshot.project_id
+    cluster_name    = mongodbatlas_cloud_backup_snapshot.snapshot.cluster_name
+    snapshot_id     = mongodbatlas_cloud_backup_snapshot.snapshot.snapshot_id
+    delivery_type_config   {
+      automated           = true
+      target_cluster_name = "BackupTarget"
+      target_project_id   = mongodbatlas_cloud_backup_snapshot.snapshot.project_id
+    }
+  }
