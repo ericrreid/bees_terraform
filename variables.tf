@@ -7,7 +7,7 @@ variable "atlas_access" {
   )
 }
 
-variable "project" {
+variable "our_project" {
   type = object(
     {
       name   = string
@@ -19,7 +19,6 @@ variable "project" {
 variable "source_cluster" {
   type = object(
     {
-      project_id = string
       provider_name = string
       name = string
       provider_instance_size_name = string
@@ -42,7 +41,6 @@ variable "source_cluster" {
 variable "target_cluster" {
   type = object(
     {
-      project_id = string
       provider_name = string
       name = string
       provider_instance_size_name = string
@@ -70,6 +68,55 @@ variable "backup_schedule" {
       reference_hour_of_day = number
       reference_minute_of_hour = number
       restore_window_days = number
+      policy_item_hourly = object({
+        frequency_interval = number
+        retention_unit = string
+        retention_value = number
+      }) 
+      policy_item_daily = object({
+        frequency_interval = number
+        retention_unit = string
+        retention_value = number
+      }) 
+      policy_item_weekly = object({
+        frequency_interval = number
+        retention_unit = string
+        retention_value = number
+      }) 
+      policy_item_monthly = object({
+        frequency_interval = number
+        retention_unit = string
+        retention_value = number
+      }) 
+    }
+  )
+}
+
+variable "snapshot" {
+  type = object(
+    {
+      description       = string
+      retention_in_days = number
+      project_id        = string
+      cluster_name      = string
+    }
+  )
+}
+
+variable "restore_job" {
+  type = object(
+    {
+      project_id      = string
+      cluster_name    = string
+      snapshot_id     = string
+      delivery_type_config = object (
+        {
+          point_in_time = bool
+          point_in_time_utc_seconds = number  
+          target_cluster_name =  string
+          target_project_id   =  string
+        }
+      )
     }
   )
 }
