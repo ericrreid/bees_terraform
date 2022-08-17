@@ -1,11 +1,11 @@
 atlas_access = {
-  public_key  = "dklcpbgo"
-  private_key = "89b94b92-0945-4745-813f-e2c8ddb31266"
+  public_key  = ""
+  private_key = ""
 }
 
 our_project = {
   name   = "BEEStest"
-  org_id = "5e2b5933014b76f526e82eba"
+  org_id = ""
 }
 
 source_cluster = {
@@ -91,5 +91,7 @@ restore_job = {
     point_in_time_utc_seconds = 0
     target_project_id  = ""
     target_cluster_name = ""
+    oplog_ts = null
+    oplog_inc = null
   }
 }

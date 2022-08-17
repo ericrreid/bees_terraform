@@ -115,6 +115,8 @@ variable "restore_job" {
           point_in_time_utc_seconds = number  
           target_cluster_name =  string
           target_project_id   =  string
+          oplog_ts = number
+          oplog_inc = number
         }
       )
     }

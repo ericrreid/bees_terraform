@@ -95,7 +95,15 @@ resource "mongodbatlas_cloud_backup_snapshot" "snapshot" {
     retention_in_days = var.snapshot.retention_in_days
 }
 
+resource "time_static" "snapshot_time" {
+  triggers = {
+    # Save the time each switch of an AMI id
+    timestamp = mongodbatlas_cloud_backup_snapshot.snapshot.created_at 
+  }
+}
+
 # Example is set up to such that source_cluster and target_cluster are in the same Project
+# Example sets PIT time to that of snapshot, but can be any time after snapshot time
 resource "mongodbatlas_cloud_backup_snapshot_restore_job" "restore_job" {
     depends_on = [
       mongodbatlas_cloud_backup_snapshot.snapshot
@@ -107,10 +115,6 @@ resource "mongodbatlas_cloud_backup_snapshot_restore_job" "restore_job" {
       target_project_id   = mongodbatlas_cloud_backup_snapshot.snapshot.project_id
       target_cluster_name = mongodbatlas_cluster.target_cluster.name
       point_in_time = var.restore_job.delivery_type_config.point_in_time
-      point_in_time_utc_seconds = mongodbatlas_cloud_backup_snapshot.snapshot.created_at
+      point_in_time_utc_seconds = time_static.snapshot_time.unix
     }
   }
-
-output "snapshot_timestamp" {
-    value = mongodbatlas_cloud_backup_snapshot.snapshot.created_at
-}
